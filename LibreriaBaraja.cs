@@ -103,9 +103,9 @@ namespace LibreriaBaraja
                 }
                 if (v > 9) //si el valor es mayor que 9 hay que quitar algun espacio en blanco porque el nº de chars aumenta
                 {
-                    return "┌───────┐\n" + "│" + v + "     |\n" + "│       |\n" + "│       |\n" + "│       |\n" + "│      " + simbolo + "|\n" + "└───────┘\n";
+                    return "┌───────┐\n" + "│" + v + "     │\n" + "│       │\n" + "│       │\n" + "│       │\n" + "│      " + simbolo + "│\n" + "└───────┘";
                 }
-                return "┌───────┐\n" + "│" + v + "      |\n" + "│       |\n" + "│       |\n" + "│       |\n" + "│      " + simbolo + "|\n" + "└───────┘\n";    
+                return "┌───────┐\n" + "│" + v + "      │\n" + "│       │\n" + "│       │\n" + "│       │\n" + "│      " + simbolo + "│\n" + "└───────┘";    
             }
             else
                 return "┌───────┐\n│║╔╗╔╗╔╗│\n│║║║║║║║│\n│║║║║║║║│\n│║║║║║║║│\n│╚╝╚╝╚╝║│\n└───────┘";
@@ -137,32 +137,29 @@ namespace LibreriaBaraja
                     v = c.getValor();
                     //Comprueba si es mayor a 2 digitos el valor 
                     if (v > 9)
-                        lineaCarta += "│" + v + "     |";
+                        lineaCarta += "│" + v + "     │";
                     else
-                        lineaCarta += "│" + v + "      |";    
+                        lineaCarta += "│" + v + "      │";    
                 }
                 else
                     lineaCarta += "│║╔╗╔╗╔╗│";
             }
             lineaCarta += "\n";
 
-            //bucle que nos crea las filas vacías (cartas.Count multiplicado por 3)
-            for(int i=0;i<cartas.Count*4;i++) 
+            //bucle que nos crea las filas vacías (cartas.Count multiplicado por 4)
+            for(int i=0;i<4;i++)
             {
-                Carta c = cartas[i];
-                bocaarriba=c.getBocaArriba();
-                if(i%cartas.Count!=cartas.Count-1)
+                foreach(Carta c in cartas)
+                {
+                    bocaarriba=c.getBocaArriba();
                     if(bocaarriba)
-                        lineaCarta += "│       |";
+                        lineaCarta += "│       │";
                     else
                         lineaCarta += "│║║║║║║║│";
-                else
-                    if(bocaarriba)
-                        lineaCarta += "│       |\n";
-                    else
-                        lineaCarta += "│║║║║║║║│\n";
+                }  
+                lineaCarta+="\n";  
             }
-
+            
             //bucle que nos crea la fila con el palo 
             foreach(Carta c in cartas) 
             {
@@ -186,7 +183,7 @@ namespace LibreriaBaraja
                             simbolo = '♠';
                             break;
                     }
-                    lineaCarta += "│      " + simbolo + "|";    
+                    lineaCarta += "│      " + simbolo + "│";    
                 }
                 else
                     lineaCarta += "│╚╝╚╝╚╝║│";
@@ -225,9 +222,9 @@ namespace LibreriaBaraja
                     v = c.getValor();
                     //Comprueba si es mayor a 2 digitos el valor 
                     if (v > 9)
-                        lineaCarta += "│" + v + "          |";
+                        lineaCarta += "│" + v + "          │";
                     else
-                        lineaCarta += "│" + v + "           |";    
+                        lineaCarta += "│" + v + "           │";    
                 }
                 else
                     lineaCarta += "││││││││││││││";
@@ -240,7 +237,7 @@ namespace LibreriaBaraja
             {  
                 bc=c.getBocaArriba();
                 if(bc)
-                    lineaCarta += "│            |";
+                    lineaCarta += "│            │";
                 else
                     lineaCarta += "│─────++─────│";
             }
@@ -269,7 +266,7 @@ namespace LibreriaBaraja
                             simbolo = '♠';
                             break;
                     }
-                    lineaCarta += "│           " + simbolo + "|";
+                    lineaCarta += "│           " + simbolo + "│";
                 }
                 else
                     lineaCarta += "││││││││││││││";
@@ -321,7 +318,7 @@ namespace LibreriaBaraja
         {
             for (int i = 0; i < (TAM-contPedidos); i++)
             {
-                Console.WriteLine(baraja[i].MuestraCarta());
+                Console.WriteLine(baraja[i].MuestraCarta()+"\n");
             }
         }
         
