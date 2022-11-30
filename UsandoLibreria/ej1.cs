@@ -33,7 +33,7 @@ namespace usandoBaraja
 				catch(Exception)
 				{
 					Console.WriteLine("Introduce n para acabar:");
-					s=Console.ReadLine(Console.ReadLine());
+					s=Console.ReadLine();
 				}
 			}
 		}
