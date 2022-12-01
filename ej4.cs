@@ -51,6 +51,9 @@ namespace usandoBaraja
 			monstruosM_E_Visibles=new List<Carta>(3);
 			monstruosJ_E_Visibles=new List<Carta>(3);
 
+			vidaM=5000;
+			vidaJ=5000;
+
 			foreach (Carta c in monstruosmaquina)
 			{
 				c.setBocaArriba(false);
@@ -130,8 +133,8 @@ namespace usandoBaraja
 		public static void MenuJugador()
 		{
 			int menu=-1;
-			bool esnum= false, noelige=true,haentrado=false;
-			while(noelige)
+			bool esnum= false, noelige=true,haentrado=false, haganado=false;
+			while(noelige && haganado==false)
 			{
 				char eleccion='N';
 				if(haentrado)
@@ -201,24 +204,44 @@ namespace usandoBaraja
 						//Pasa turno
 					break;
 				}
+				if(vidaM<=0)
+					haganado=Victoria('J');
+				if(vidaJ<=0)
+					haganado=Victoria('M');
 			}
 		}
 		public static void MaquinaEnJuego()
 		{
 			Console.Clear();
-			vidaM=5000;
 			BannerMaquina();
 			Console.WriteLine("\nVida:"+vidaM);
 			Console.WriteLine("\n\n"+Carta.MuestraCartasHorizontal(monstruosM_E_Visibles));
 			Console.WriteLine("\n"+Carta.MuestraCartasHorizontalT(monstruosM_N_Visibles));
 		}
+		public static void MaquinaSiendoAtacada(int atacante)
+		{
+			Console.Clear();
+			BannerMaquina();
+			Console.WriteLine("\nVida:"+vidaM);
+			//Hacemos una lista secundaria para que solo nos muestre las cartas adyacentes es decir en la casilla de enfrene o las de los lados en 1
+			List<Carta> monstruosM_N_Visibles_PA=new List<Carta>();
+			for(int i=0;i<3;i++)
+			{
+				if(i==atacante-1 || i==atacante || i==atacante+1)
+					monstruosM_N_Visibles_PA.Add(monstruosM_N_Visibles[i]);
+			}
+			
+			Console.WriteLine("\n"+Carta.MuestraCartasHorizontalT(monstruosM_N_Visibles_PA));
+		}
 		public static void JugadorEnJuego()
 		{
 			//TODO Fixear que la vida no baja cambiando la declaración de esta y la modificación a un método ajeno
-			vidaJ=5000;
+			
 			Console.WriteLine(Carta.MuestraCartasHorizontalT(monstruosJ_N_Visibles)+"\n");
 			Console.WriteLine(Carta.MuestraCartasHorizontal(monstruosJ_E_Visibles)+"\n\n");
 			Console.WriteLine("Vida:"+vidaJ+"\n");
+
+
 		}
 		public static void Juego()
 		{
@@ -227,11 +250,11 @@ namespace usandoBaraja
 			BannerJugador();
 			MenuJugador(); 
 		}
-		public static Tuple<int,int> EligeAtacante()
+		public static Tuple<int,int,int> EligeAtacante()
 		{
 			bool esunmonstruo=false;
 			int seleccion;
-			Tuple<int,int> stats=new Tuple<int,int>(0,0);
+			Tuple<int,int,int> stats=new Tuple<int,int,int>(0,0,0);
 			while(esunmonstruo==false)
 			{
 				Console.Clear();
@@ -251,26 +274,67 @@ namespace usandoBaraja
 			}	
 			return stats;
 		}
-		//TODO Hacer que solo pueda golpear a los adyacentes y crear un método que solo me muestre a los adyacentes(EligeObjetivoMonstruo y EligeObjetivoEspecial?)
-		public static Tuple<int,int> EligeObjetivo()
+		public static Tuple<int,int,int> EligeObjetivo(int atacante)
 		{
 			bool esunmonstruo=false;
 			int seleccion;
-			Tuple<int,int> stats=new Tuple<int,int>(0,0);
+			Tuple<int,int,int> stats=new Tuple<int,int,int>(0,0,0);
 			while(esunmonstruo==false)
 			{
 				Console.Clear();
-				MaquinaEnJuego();
-				Console.WriteLine("  Carta 1 \t Carta 2\tCarta 3");
+				MaquinaSiendoAtacada(atacante);
+				string cartasdisponibles="";
+				if(atacante==0)
+					cartasdisponibles="  Carta 1 \t Carta 2";
+				if(atacante==1)
+					cartasdisponibles="  Carta 1 \t Carta 2\tCarta 3";
+				if(atacante==2)
+					cartasdisponibles="  Carta 2\tCarta 3";
+
+				Console.WriteLine(cartasdisponibles);
 
 				Console.WriteLine("\nSelecciona la carta que quieres atacar introduciendo su numero:");
 				esunmonstruo=int.TryParse(Console.ReadLine(),out seleccion);
-				if(seleccion<0 || seleccion>3)
+				if(atacante==0)
 				{
-					Console.WriteLine("Ese Monstruo no se encuentra en la arena");
-					esunmonstruo=false;
-					Console.ReadLine();
+					if(seleccion<0 || seleccion>3)
+					{
+						Console.WriteLine("Ese Monstruo no se encuentra en la arena");
+						esunmonstruo=false;
+						Console.ReadLine();
+					}
+					else if(seleccion==3)
+					{
+						Console.WriteLine("Ese Monstruo no se encuentra fuera del alcance del tuyo");
+						esunmonstruo=false;
+						Console.ReadLine();
+					}
 				}
+				if(atacante==1)
+				{
+					if(seleccion<0 || seleccion>3)
+					{
+						Console.WriteLine("Ese Monstruo no se encuentra en la arena");
+						esunmonstruo=false;
+						Console.ReadLine();
+					}
+				}
+				if(atacante==2)
+				{
+					if(seleccion<0 || seleccion>3)
+					{
+						Console.WriteLine("Ese Monstruo no se encuentra en la arena");
+						esunmonstruo=false;
+						Console.ReadLine();
+					}
+					else if(seleccion==1)
+					{
+						Console.WriteLine("Ese Monstruo no se encuentra fuera del alcance del tuyo");
+						esunmonstruo=false;
+						Console.ReadLine();
+					}
+				}
+				
 				if(esunmonstruo)
 					stats=DameATKyDEF(seleccion,'M');	
 			}	
@@ -278,41 +342,53 @@ namespace usandoBaraja
 		}
 		public static void Ataque()
 		{
-			Tuple<int,int> statsA, statsO;
-			int ATKA=0,DEFO=0;
-			char eleccion;
-			bool seguro=false,esunchar;
+			Tuple<int,int,int> statsA, statsO=new Tuple<int,int,int>(0,0,0);
+			int ATKA=0,DEFO=0,atacante=0;
+			char eleccion='N';
+			bool seguro=false,esunchar,esunchara=false;
 			while(seguro==false)
 			{
+				esunchar=false;
 				statsA=EligeAtacante();
 				Console.WriteLine("\nEstas son las estadisticas del Monstruo: ATK:"+statsA.Item1+" DEF:"+statsA.Item2);
 				Console.WriteLine("Estás seguro de elegir esta carta para tu ataque?(S/N)");
-				esunchar=char.TryParse(Console.ReadLine(),out eleccion);
+				while(esunchar==false)
+					esunchar=char.TryParse(Console.ReadLine(),out eleccion);
 				seguro=SioNo(eleccion);
 				ATKA=statsA.Item1;
-			}
-			seguro=false;
-			while(seguro==false)
-			{
-				statsO=EligeObjetivo();
-				Console.WriteLine("Estás seguro de elegir esta carta como tu objetivo?(S/N)");
-				esunchar=char.TryParse(Console.ReadLine(),out eleccion);
-				seguro=SioNo(eleccion);
-				DEFO=statsO.Item2;
+				atacante=statsA.Item3-1;
+			
+				if(seguro)
+				{
+					statsO=EligeObjetivo(atacante);
+					Console.WriteLine("Estás seguro de elegir esta carta como tu objetivo?(S/N)");
+					while(esunchara==false)
+						esunchara=char.TryParse(Console.ReadLine(),out eleccion);
+					seguro=SioNo(eleccion);
+					DEFO=statsO.Item2;
+				}
 			}
 
+			HaActuado(statsO.Item3,'M');
+
 			int ganador=ATKA-DEFO;
+			MaquinaEnJuego();
 			if(ganador>=0)
 			{
 				Console.Write("Carta Enemiga Eliminada");
 				if(ganador==0)
+				{
 					Console.WriteLine(", el enemigo no recibe daño");
+					Console.WriteLine("Como la carta ha sido eliminada se cambiará por otra de la baraja del mimso tipo");
+					EliminaCarta(statsO.Item3,'M');
+				}
 				else
 				{
 					Console.WriteLine(", el enemigo recibe "+ganador+" de daño");
 					vidaM-=ganador;
+					Console.WriteLine("Como la carta ha sido eliminada se cambiará por otra de la baraja del mimso tipo");
+					EliminaCarta(statsO.Item3,'M');
 				}
-					
 			}
 			else
 			{
@@ -320,7 +396,40 @@ namespace usandoBaraja
 				vidaJ+=ganador;
 			}
 		}
-		public static Tuple<int,int> DameATKyDEF(int cartaseleccionada,char Personaje)
+		public static void HaActuado(int cartaafligida, char Personaje)
+		{
+			if(Personaje=='M')
+				monstruosM_N_Visibles[cartaafligida-1].setBocaArriba(true);
+			if(Personaje=='J')
+				monstruosJ_N_Visibles[cartaafligida-1].setBocaArriba(true);
+		}
+		public static void EliminaCarta(int cartaafligida,char Personaje)
+		{
+			if(Personaje=='M')
+			{
+				if(monstruosM_N.Count>0)
+				{
+					monstruosM_N_Visibles[cartaafligida-1]=monstruosM_N[monstruosM_N.Count-1];
+					monstruosM_N.RemoveAt(monstruosM_N.Count-1);
+				}
+				else
+				{
+
+					vidaM=0;
+				}
+			}
+			if(Personaje=='J')
+			{
+				if(monstruosJ_N.Count>0)
+				{
+					monstruosJ_N_Visibles[cartaafligida-1]=monstruosJ_N[monstruosJ_N.Count-1];
+					monstruosJ_N.RemoveAt(monstruosJ_N.Count-1);
+				}
+				else
+					Console.WriteLine("Pierdes, te has quedado sin cartas");
+			}
+		}
+		public static Tuple<int,int,int> DameATKyDEF(int cartaseleccionada,char Personaje)
 		{	
 			Carta carta=new Carta(ePalo.Diamantes,eValor.As);
 			if(Personaje=='J')
@@ -355,7 +464,7 @@ namespace usandoBaraja
 					ATK=1500;DEF=1500;
 				break;
 			}
-			return Tuple.Create(ATK,DEF);
+			return Tuple.Create(ATK,DEF,cartaseleccionada);
 		}
 		public static void Instrucciones()
 		{
@@ -459,6 +568,38 @@ namespace usandoBaraja
 							"╚█████╔╝╚██████╔╝╚██████╔╝██║  ██║██████╔╝╚██████╔╝██║  ██║\n"+
 							" ╚════╝  ╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝");
 		}
+		public static bool Victoria(char Personaje)
+		{
+			Console.Clear();
+			if(Personaje=='J')
+			{
+				Console.WriteLine(" ____  ____       _       ______       ______       _       ____  _____       _       ______      ___\n"+    
+								"|_   ||   _|     / \\    .' ____ \\    .' ___  |     / \\     |_   \\|_   _|     / \\     |_   _ `.  .'   `.  \n"+
+								"  | |__| |      / _ \\   | (___ \\_|  / .'   \\_|    / _ \\      |   \\ | |      / _ \\      | | `. \\/  .-.  \\ \n"+
+								"  |  __  |     / ___ \\   _.____`.   | |   ____   / ___ \\     | |\\ \\| |     / ___ \\     | |  | || |   | | \n"+
+								" _| |  | |_  _/ /   \\ \\_| \\____) |  \\ `.___]  |_/ /   \\ \\_  _| |_\\   |_  _/ /   \\ \\_  _| |_.' /\\  `-'  / \n"+
+								"|____||____||____| |____|\\______.'   `._____.'|____| |____||_____|\\____||____| |____||______.'  `.___.'  ");
+			}
+			else if(Personaje=='M')
+			{
+				Console.WriteLine(" ____  ____       _       ______     _______  ________  _______     ______   _____  ______      ___    \n"+
+								"|_   ||   _|     / \\    .' ____ \\   |_   __ \\|_   __  ||_   __ \\   |_   _ `.|_   _||_   _ `.  .'   `.  \n"+
+								"  | |__| |      / _ \\   | (___ \\_|    | |__) | | |_ \\_|  | |__) |    | | `. \\ | |    | | `. \\/  .-.  \\ \n"+
+								"  |  __  |     / ___ \\   _.____`.     |  ___/  |  _| _   |  __ /     | |  | | | |    | |  | || |   | | \n"+
+								" _| |  | |_  _/ /   \\ \\_| \\____) |   _| |_    _| |__/ | _| |  \\ \\_  _| |_.' /_| |_  _| |_.' /\\  `-'  / \n"+
+								"|____||____||____| |____|\\______.'  |_____|  |________||____| |___||______.'|_____||______.'  `.___.'  ");
+			}
+
+			Console.ReadLine();
+			Console.Clear();
+			Console.WriteLine(" ██████  ██████   █████   ██████ ██  █████  ███████     ██████   ██████  ██████           ██ ██    ██  ██████   █████  ██████  \n"+
+							"██       ██   ██ ██   ██ ██      ██ ██   ██ ██          ██   ██ ██    ██ ██   ██          ██ ██    ██ ██       ██   ██ ██   ██ \n"+
+							"██   ███ ██████  ███████ ██      ██ ███████ ███████     ██████  ██    ██ ██████           ██ ██    ██ ██   ███ ███████ ██████  \n"+
+							"██    ██ ██   ██ ██   ██ ██      ██ ██   ██      ██     ██      ██    ██ ██   ██     ██   ██ ██    ██ ██    ██ ██   ██ ██   ██ \n"+
+							" ██████  ██   ██ ██   ██  ██████ ██ ██   ██ ███████     ██       ██████  ██   ██      █████   ██████   ██████  ██   ██ ██   ██ ");
+
+			return true;
+		}
 	}
 
 	class ej4 
@@ -470,11 +611,12 @@ namespace usandoBaraja
 			DueloDeMonstruos.Menu();
 
 			Baraja baraja = new Baraja();
-			baraja.RellenaBaraja();
-			baraja.MezclaBaraja();
 			Carta c;
 			List<Carta> monstruosjugador=new List<Carta>();
 			List<Carta> monstruosmaquina=new List<Carta>();
+
+			baraja.RellenaBaraja();
+			baraja.MezclaBaraja();
 			//Rellena las manos de los jugadores de la misma baraja para no repetir cartas
 			for(int i=0; i<25;i++)
 			{
@@ -483,7 +625,6 @@ namespace usandoBaraja
 				c = baraja.PideCarta();
 				monstruosmaquina.Add(c);				
 			}	
-
 			DueloDeMonstruos.GeneraMonstruos(monstruosmaquina,monstruosjugador);
 			DueloDeMonstruos.Juego();
 		}
