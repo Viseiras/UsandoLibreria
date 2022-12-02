@@ -342,7 +342,7 @@ namespace LibreriaBaraja
             try //try que controla que salte un mensaje de error cuandos se llame a este metodo sin haber rellenado la baraja
             {
                 contPedidos = 0;
-                var random = new Random();
+                Random random = new Random();
                 Carta aux;
 
                 //bucle que mezcla las cartas aleatoriamente pasando por todas
