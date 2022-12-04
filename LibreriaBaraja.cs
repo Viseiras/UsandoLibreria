@@ -1,3 +1,5 @@
+//ESTA LIBRERIA HA SIDO LIGERAMENTE MODIFICADA CON PROPOSITOS DE DESARROLLO DE DUELO DE MONSTRUOS
+
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -107,6 +109,7 @@ namespace LibreriaBaraja
                 }
                 return "┌───────┐\n" + "│" + v + "      │\n" + "│       │\n" + "│       │\n" + "│       │\n" + "│      " + simbolo + "│\n" + "└───────┘";    
             }
+            //Muestra la carta boca abajo
             else
                 return "┌───────┐\n│║╔╗╔╗╔╗│\n│║║║║║║║│\n│║║║║║║║│\n│║║║║║║║│\n│╚╝╚╝╚╝║│\n└───────┘";
             
@@ -121,6 +124,7 @@ namespace LibreriaBaraja
             int p; //palo
             int v; //valor
             char simbolo = ' ';//♠', '♦', '♥', '♣
+            //Esta variable distingue si se va a escribir boca arriba o boca abajo la carta
             bool bocaarriba;
 
             //bucle en el que se crea la parte superior de la carta tantas veces como numero se le haya pasado al metodo como parametro
@@ -166,7 +170,7 @@ namespace LibreriaBaraja
                 bocaarriba=c.getBocaArriba();
                 if(bocaarriba)
                 {
-                        //nos devuelve el palo de la carta para que en simbolo se almacene el del correspondiente palo
+                    //nos devuelve el palo de la carta para que en simbolo se almacene el del correspondiente palo
                     p = c.getPalo();
                     switch (p)
                     {
@@ -197,6 +201,7 @@ namespace LibreriaBaraja
 
             return lineaCarta;
         }
+        //Igual que Muestra Cartas Horizontal pero con las cartas tumbadas
         public static String MuestraCartasHorizontalT(List<Carta> cartas)
         {
             //Declaración de variables de el método
